@@ -5,11 +5,11 @@ import logger from 'lib/logger';
 import notifyTwitter from 'lib/twitter/notifyTwitter';
 
 const config = loadConfig(process.env as Env);
-const { ablyToken } = config;
+const { ablyToken, twitter } = config;
 const options: Ably.Types.ClientOptions = { key: ablyToken };
 const client = new Ably.Realtime(options);
 
-const actionTypesToWatch = ['LISTING', 'TRANSACTION'];
+const actionTypesToWatch = ['TRANSACTION'];
 
 export default function startAblyFeedFor(
   projectChannel: string,
@@ -24,10 +24,12 @@ export default function startAblyFeedFor(
   channel.subscribe(function(message) {
     let data = JSON.parse(message.data);
     let actionType = data.action_type;
-
+    
     if (actionTypesToWatch.includes(actionType)) {
       notifyDiscord(discordChannelId, actionType, message.data);
-      notifyTwitter(message.data, actionType);
+      if (twitter.isActive == 'true') {
+        notifyTwitter(message.data, actionType);
+      }
     }
   });
 }

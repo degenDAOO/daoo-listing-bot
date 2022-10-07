@@ -7,6 +7,7 @@ export interface Subscription {
 }
 
 interface TwitterConfig {
+  isActive: string;
   appKey: string;
   appSecret: string;
   accessToken: string;
@@ -70,6 +71,7 @@ function loadSubscriptions(env: Env): Subscription[] {
 export function loadConfig(env: Env): MutableConfig {
   const config: Config = {
     twitter: {
+      isActive: env.TWITTER_ACTIVE || "false",
       appKey: env.TWITTER_API_KEY || "",
       appSecret: env.TWITTER_API_KEY_SECRET || "",
       accessToken: env.TWITTER_ACCESS_TOKEN || "",
