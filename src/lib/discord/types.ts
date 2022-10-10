@@ -1,5 +1,6 @@
 import { MessageActionRow, MessageEmbed } from "discord.js";
 import truncateForAddress from "lib/truncateForAddress";
+import { getMarketplaceName } from "lib/getMarketplaceName";
 
 
 function listingAction(data: any, attributes: any) {
@@ -104,7 +105,7 @@ function saleAction(data: any, attributes: any) {
     });
 
     // Add in the divider between Price/Seller if we show metadata
-    fields.splice(2, 0, {
+    fields.splice(3, 0, {
       name: '\u200B',
       value: '__Hidden Traits__',
       inline: false
