@@ -1,6 +1,5 @@
 import { MessageActionRow, MessageEmbed } from "discord.js";
 import truncateForAddress from "lib/truncateForAddress";
-import { getMarketplaceName } from "lib/getMarketplaceName";
 
 
 function listingAction(data: any, attributes: any) {
