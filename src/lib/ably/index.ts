@@ -21,7 +21,10 @@ export default function startAblyFeedFor(
     logger.log(`Successful connect: ${projectChannel}`);
   });
 
-  channel.subscribe('TRANSACTION', function(message) {    
+  channel.subscribe('TRANSACTION', function(message) {
+    const data = JSON.parse(message.data);
+    logger.log(`Ably inbound msg: ${data.item.name} - ${data.action_type}`); 
+
     notifyDiscord(discordChannelId, 'TRANSACTION', message.data);
     if (twitter.isActive == 'true') {
       notifyTwitter(message.data, 'TRANSACTION');

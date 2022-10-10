@@ -137,7 +137,7 @@ function saleAction(data: any, attributes: any) {
       {
         style: 5,
         label: `View Transaction`,
-        url: `https://solscan.io/tx/${data.request_details.signature}`,
+        url: `https://solscan.io/tx/${data.item.market_place_state.signature}`,
         disabled: false,
         emoji: {
           id: null,
