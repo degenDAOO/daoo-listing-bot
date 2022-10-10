@@ -9,7 +9,7 @@ const { ablyToken, twitter } = config;
 const options: Ably.Types.ClientOptions = { key: ablyToken };
 const client = new Ably.Realtime(options);
 
-const actionTypesToWatch = ['TRANSACTION'];
+// const actionTypesToWatch = ['TRANSACTION'];
 
 export default function startAblyFeedFor(
   projectChannel: string,
@@ -21,15 +21,10 @@ export default function startAblyFeedFor(
     logger.log(`Successful connect: ${projectChannel}`);
   });
 
-  channel.subscribe(function(message) {
-    let data = JSON.parse(message.data);
-    let actionType = data.action_type;
-    
-    if (actionTypesToWatch.includes(actionType)) {
-      notifyDiscord(discordChannelId, actionType, message.data);
-      if (twitter.isActive == 'true') {
-        notifyTwitter(message.data, actionType);
-      }
+  channel.subscribe('TRANSACTION', function(message) {    
+    notifyDiscord(discordChannelId, 'TRANSACTION', message.data);
+    if (twitter.isActive == 'true') {
+      notifyTwitter(message.data, 'TRANSACTION');
     }
   });
 }
