@@ -21,7 +21,6 @@ export interface Config {
   actions: ProjectActions[];
   ablyToken: string;
   hsToken: string;
-  bannedTokens: Array<String>;
 }
 
 export type Env = { [key: string]: string };
@@ -73,7 +72,6 @@ export function loadConfig(env: Env): MutableConfig {
     ablyToken: env.ABLY_TOKEN,
     actions: loadActions(env),
     hsToken: env.HYPERSPACE_API_TOKEN,
-    bannedTokens: env.BANNED_TOKENS.split(","),
   };
 
   return {
