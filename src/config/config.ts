@@ -1,9 +1,9 @@
 import logger from "lib/logger";
 
-export interface Subscription {
+export interface ProjectActions {
+  projectId: string;
+  actions: string;
   discordChannelId: string;
-  type: "NFTActivity";
-  projectChannel: string;
 }
 
 interface TwitterConfig {
@@ -18,54 +18,45 @@ export interface Config {
   twitter: TwitterConfig;
   discordBotToken: string;
   queueConcurrency: number;
-  subscriptions: Subscription[];
+  actions: ProjectActions[];
   ablyToken: string;
+  hsToken: string;
   bannedTokens: Array<String>;
 }
 
 export type Env = { [key: string]: string };
 
 export interface MutableConfig extends Config {
-  setSubscriptions(subscriptions: Subscription[]): Promise<void>;
+  setActions(actions: ProjectActions[]): Promise<void>;
 
-  addSubscription(subscription: Subscription): Promise<void>;
+  addActions(action: ProjectActions): Promise<void>;
 }
 
-function loadSubscriptions(env: Env): Subscription[] {
-  if (!env.SUBSCRIPTION_CHANNEL_ID || !env.SUBSCRIPTION_DISCORD_CHANNEL_ID) {
+function loadActions(env: Env): ProjectActions[] {
+  if (!env.SUBSCRIPTION_PROJECT_ID || !env.SUBSCRIPTION_DISCORD_CHANNEL_ID) {
     return [];
   }
-  const addresses = env.SUBSCRIPTION_CHANNEL_ID.split(",");
+  const project_id = env.SUBSCRIPTION_PROJECT_ID;
   const discordChannels = env.SUBSCRIPTION_DISCORD_CHANNEL_ID.split(",");
-  if (
-    discordChannels.length != addresses.length &&
-    discordChannels.length !== 1
-  ) {
-    logger.error(
-      `Invalid number of discord channel ids: ${discordChannels.length}`
-    );
-    return [];
-  }
+  const action_types = env.SUBSCRIPTION_ACTIONS.split(",");
 
-  const subscriptions: Subscription[] = [];
+  const watch: ProjectActions[] = [];
 
-  addresses.forEach((address, idx) => {
-    if (!address) {
-      return;
-    }
+  action_types.forEach((action, idx) => {
     const channel = discordChannels[idx] || discordChannels[0];
     if (!channel) {
       return;
     }
+    watch.push({
+      projectId: project_id,
+      actions: action,
+      discordChannelId: channel
+    })
 
-    subscriptions.push({
-      type: "NFTActivity",
-      discordChannelId: channel,
-      projectChannel: address,
-    });
-  });
+  })
 
-  return subscriptions;
+  return watch;
+
 }
 
 export function loadConfig(env: Env): MutableConfig {
@@ -79,18 +70,19 @@ export function loadConfig(env: Env): MutableConfig {
     },
     discordBotToken: env.DISCORD_BOT_TOKEN || "",
     queueConcurrency: parseInt(env.QUEUE_CONCURRENCY || "2", 10),
-    subscriptions: loadSubscriptions(env),
     ablyToken: env.ABLY_TOKEN,
+    actions: loadActions(env),
+    hsToken: env.HYPERSPACE_API_TOKEN,
     bannedTokens: env.BANNED_TOKENS.split(","),
   };
 
   return {
     ...config,
-    async setSubscriptions(subscriptions: Subscription[]): Promise<void> {
-      this.subscriptions = subscriptions;
+    async setActions(actions: ProjectActions[]): Promise<void> {
+      this.actions = actions;
     },
-    async addSubscription(subscription: Subscription): Promise<void> {
-      this.subscriptions.push(subscription);
+    async addActions(action: ProjectActions): Promise<void> {
+      this.actions.push(action);
     },
   };
 }

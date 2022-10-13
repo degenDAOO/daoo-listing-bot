@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import {Env, loadConfig} from "config";
 import logger from "lib/logger";
-import startAblyFeedFor from "lib/ably";
+import startAblyFeedForAction from "lib/ably";
 
 const result = dotenv.config();
 
@@ -10,16 +10,23 @@ if (result.error) {
 }
 
 const config = loadConfig(process.env as Env);
-const {subscriptions, bannedTokens} = config;
+const {actions} = config;
 
-if (!subscriptions.length) {
-  logger.warn('No subscriptions loaded');
+if (!actions.length) {
+  logger.warn('No actions loaded');
 }
 
-if (bannedTokens.length) {
-  logger.log(`Banned Tokens: ${bannedTokens}`);
-}
+// if (bannedTokens.length) {
+//   logger.log(`Banned Tokens: ${bannedTokens}`);
+// }
 
-subscriptions.map((s) => {
-  startAblyFeedFor(s.projectChannel, s.discordChannelId);
-});
+// subscriptions.map((s) => {
+//   startAblyFeedFor(s.projectChannel, s.discordChannelId);
+// });
+
+actions.map((a) => {
+  logger.log(`actions project: ${a.projectId}`);
+  logger.log(`actions action: ${a.actions}`);
+  logger.log(`actions discordId: ${a.discordChannelId}`);
+  startAblyFeedForAction(a.projectId, a.actions, a.discordChannelId);
+})

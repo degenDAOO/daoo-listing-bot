@@ -5,14 +5,13 @@ import logger from 'lib/logger';
 import notifyTwitter from 'lib/twitter/notifyTwitter';
 
 const config = loadConfig(process.env as Env);
-const { ablyToken, twitter } = config;
+const { ablyToken } = config;
 const options: Ably.Types.ClientOptions = { key: ablyToken };
 const client = new Ably.Realtime(options);
 
-// const actionTypesToWatch = ['TRANSACTION'];
-
-export default function startAblyFeedFor(
+export default function startAblyFeedForAction(
   projectChannel: string,
+  actionType: string,
   discordChannelId: string
 ) {
   let channel = client.channels.get(projectChannel);
@@ -21,13 +20,9 @@ export default function startAblyFeedFor(
     logger.log(`Successful connect: ${projectChannel}`);
   });
 
-  channel.subscribe('TRANSACTION', function(message) {
-    const data = JSON.parse(message.data);
-    logger.log(`Ably inbound msg: ${data.item.name} - ${data.action_type}`); 
-
-    notifyDiscord(discordChannelId, 'TRANSACTION', message.data);
-    if (twitter.isActive == 'true') {
-      notifyTwitter(message.data, 'TRANSACTION');
-    }
+  channel.subscribe(actionType, function(message) {
+    notifyDiscord(discordChannelId, actionType, message.data);
+    // not tweeting on this one.
+    // notifyTwitter(message.data, actionType);    
   });
 }
