@@ -79,6 +79,10 @@ function saleAction(data: any, attributes: any) {
     {
       name: 'Price',
       value: `${data.item.market_place_state.price} SOL`,
+    },
+    {
+      name: 'Buyer',
+      value: `[${truncateForAddress(data.item.market_place_state.buyer_address as string)}](https://hyperspace.xyz/account/${data.item.market_place_state.buyer_address})`,
       inline: true
     },
     {
@@ -100,7 +104,7 @@ function saleAction(data: any, attributes: any) {
     });
 
     // Add in the divider between Price/Seller if we show metadata
-    fields.splice(2, 0, {
+    fields.splice(3, 0, {
       name: '\u200B',
       value: '__Hidden Traits__',
       inline: false
@@ -109,7 +113,7 @@ function saleAction(data: any, attributes: any) {
 
   const embedMsg = new MessageEmbed({
     color: 0x3FAF49,
-    title: `Sold for:\u000A${data.item.market_place_state.price} SOL`,
+    title: `${data.item.name} sold for:\u000A${data.item.market_place_state.price} SOL`,
     description: '\u200B',
     url: `https://hyperspace.xyz/token/${data.token_address}`,
     image: {
@@ -119,7 +123,7 @@ function saleAction(data: any, attributes: any) {
     },
     fields: fields,
     author: {
-      name: `${data.action_type}  →  Rank: ${data.item?.rank_est}`
+      name: `SOLD → Rank: ${data.item?.rank_est}`
     },
     footer: {
       text: 'Data provided by Hyperspace  |  🤖 by JSB',
@@ -132,7 +136,18 @@ function saleAction(data: any, attributes: any) {
     components: [
       {
         style: 5,
-        label: `View on Hyperspace`,
+        label: `View Transaction`,
+        url: `https://solscan.io/tx/${data.item.market_place_state.signature}`,
+        disabled: false,
+        emoji: {
+          id: null,
+          name: `🕵🏻‍♂️`
+        },
+        type: 2,
+      },
+      {
+        style: 5,
+        label: `View Token Detail`,
         url: `https://hyperspace.xyz/token/${data.token_address}`,
         disabled: false,
         emoji: {
