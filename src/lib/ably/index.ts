@@ -15,14 +15,14 @@ export default function startAblyFeedFor(
 ) {
   let channel = client.channels.get(projectChannel);
 
-  client.connection.on('connected', function() {
+  client.connection.on('connected', function () {
     logger.log(`Successful connect: ${projectChannel}`);
   });
 
-  channel.subscribe('LISTING', function(message) {
+  channel.subscribe('LISTING', function (message) {
     let data = JSON.parse(message.data);
 
-    if (! bannedTokens.includes(data.token_address)) {
+    if (!bannedTokens.includes(data.token_address) || !bannedTokens.includes(data.item.market_place_state.seller_address)) {
       notifyDiscordSale(discordChannelId, message.data);
       notifyTwitter(message.data);
     } else {
@@ -30,3 +30,4 @@ export default function startAblyFeedFor(
     }
   });
 }
+
