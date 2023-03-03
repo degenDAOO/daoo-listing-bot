@@ -22,7 +22,7 @@ export default function startAblyFeedFor(
   channel.subscribe('LISTING', function (message) {
     let data = JSON.parse(message.data);
 
-    if (!bannedTokens.includes(data.token_address) || !bannedTokens.includes(data.item.market_place_state.seller_address)) {
+    if (!bannedTokens.includes(data.item.market_place_state.seller_address)) {
       notifyDiscordSale(discordChannelId, message.data);
       notifyTwitter(message.data);
     } else {
